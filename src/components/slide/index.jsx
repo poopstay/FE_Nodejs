@@ -15,8 +15,7 @@ function Slide(props) {
     
     return (
         <Sider trigger={null} collapsible collapsed={false}>
-      <div className="logo-header" ><h2>Admin</h2></div>
-        <div className='title-slide'><h6>App</h6></div>
+      <div className="logo-header" ><h2>Add content</h2></div>
         <Menu
           theme="dark"
           mode="inline"
@@ -24,49 +23,16 @@ function Slide(props) {
           onClick={onClick}
           items={[
             {
-              key: "1",
-              icon: <ShoppingFilled />,
+              key: "products",
               label: "Products",
-              children: [
-                {
-                  key: "addproduct",
-                  label: "Add Product",
-                },
-                {
-                  key: "products",
-                  label: "Products List",
-                },
-              ],
             },
             {
-                key: "2",
-                icon: <AppstoreOutlined />,
+                key: "categories",
                 label: "Categories",
-                children: [
-                  {
-                    key: "addcategory",
-                    label: "Add Category",
-                  },
-                  {
-                    key: "categories",
-                    label: "Category List",
-                  }
-                ],
               },
               {
-                key: "3",
-                icon: <ShopOutlined />,
+                key: "suppliers",
                 label: "Suppliers",
-                children: [
-                  {
-                    key: "addsupplier",
-                    label: "Add Supplier",
-                  },
-                  {
-                    key: "suppliers",
-                    label: "Supplier List",
-                  },
-                ],
               },
             // {
             //   key: "4",
@@ -102,35 +68,6 @@ function Slide(props) {
             //     },
             //   ],
             // },
-          ]}
-        />
-        <div  className='title-slide'><h6>Pages</h6></div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          onClick={onClick}
-          items={[
-            {
-              key: "4",
-              icon: <UserOutlined />,
-              label: "Authentication",
-              children: [
-                {
-                  key: "upload",
-                  label: "Upload File",
-                },
-                {
-                  key: "myprofile",
-                  label: "My Profile",
-                },
-                {
-                  key: "logout",
-                  label: "Logout",
-                },
-                
-              ],
-            },
           ]}
         />
       </Sider>

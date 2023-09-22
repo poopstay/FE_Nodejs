@@ -1,6 +1,5 @@
 // import
 import React, { memo, useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
 import {
   Space,
   Table,
@@ -16,11 +15,10 @@ import {
 } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
-import './details.scss'
+import "./details.scss";
 import { axiosClient } from "helper/axiosClient";
-import axios from "axios";
 import ProductsForm from "./productsForm";
-const url = process.env.REACT_APP_BASE_URL_USER;
+const url = process.env.REACT_APP_BASE_USE_URL;
 function Products() {
   // variable
   const DEFAULT_LIMIT = 5;
@@ -52,60 +50,28 @@ function Products() {
     [updateForm]
   );
 
-  const onFinish = useCallback(async (values) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", values.upload.file);
-
-      const img = await axios.post(
-        `${url}media/upload-single`,
-        formData
-      );
-      const {
-        name,
-        price,
-        discount,
-        stock,
-        description,
-        categoryId,
-        supplierId,
-      } = values;
-      const data = {
-        name,
-        price,
-        discount,
-        stock,
-        description,
-        categoryId,
-        supplierId,
-        mediaId: `${img.data.payload._id}`,
-      };
-
-      console.log("◀◀◀ data ▶▶▶", data);
-      await axiosClient.post("/products", data);
-      message.success("Thêm sản phẩm thành công");
-      setRefresh(refresh + 1);
-      setIsHidden(true);
-    } catch (error) {
-      console.log("◀◀◀ error ▶▶▶", error);
-      if (error?.response?.data?.error) {
-        const { code, keyValue } = error.response.data.error;
-        if (code === 11000) {
-          return message.error(`Mã sản phẩm ${keyValue.name} đã tồn tại`);
-        }
+  const onFinish = useCallback(
+    async (values) => {
+      try {
+        await axiosClient.post("/products", values);
+        setRefresh(refresh + 1);
+        setIsHidden(true);
+        alert("Thêm sản phẩm thành công");
+      } catch (error) {
+        return alert("Thêm sản phẩm thất bại");
       }
-      return message.error("Thêm sản phẩm thất bại");
-    }
-  }, [refresh]);
+    },
+    [refresh]
+  );
   const onDeleteFinish = useCallback(
     (id) => async () => {
       try {
         await axiosClient.patch(`/products/delete/${id}`);
 
         setRefresh(refresh + 1);
-        message.success("Xóa thành công")
+        alert("Xóa thành công");
       } catch (error) {
-        message.error("Xóa thất bại");
+        alert("Xóa thất bại");
       }
     },
     [refresh]
@@ -113,28 +79,7 @@ function Products() {
   const onEditFinish = useCallback(
     async (data) => {
       try {
-        if (data.upload) {
-          const formData = new FormData();
-          formData.append("file", data.upload.file);
-
-          const img = await axios.post(
-            `${url}media/upload-single`,
-            formData
-          );
-          const dataInsert = {
-            name: data.name,
-            price: data.price,
-            discount: data.discount,
-            stock: data.stock,
-            description: data.description,
-            categoryId: data.categoryId,
-            supplierId: data.supplierId,
-            mediaId: `${img.data.payload._id}`,
-          };
-          await axiosClient.put(`/products/${selectedProduct._id}`, dataInsert);
-        } else {
-          await axiosClient.put(`/products/${selectedProduct._id}`, data);
-        }
+        await axiosClient.put(`/products/${selectedProduct._id}`, data);
         setRefresh(refresh + 1);
         updateForm.resetFields();
         setEditModalVisible(false);
@@ -149,7 +94,7 @@ function Products() {
   const getProductData = useCallback(async () => {
     try {
       const res = await axiosClient.get(
-        `/products?page=${pagination.page}&pageSize=${pagination.pageSize}${
+        `products?page=${pagination.page}&pageSize=${pagination.pageSize}${
           search.categoryId ? `&categoryId=${search.categoryId}` : ""
         }`
       );
@@ -205,35 +150,7 @@ function Products() {
     {
       title: "Name",
       key: "name",
-      render: (text, record, index) => {
-        return <Link to={`/product_details/${record._id}`}>{record.name}</Link>;
-      },
-    },
-    {
-      title: "Hình ảnh",
-      key: "mediaId",
-      render: (text, record, index) => {
-        if (record.image)
-          return (
-        <div className="img-products">
-            <img
-              src={`${url}${
-                record.image.location.split("public", 2)[1]
-              }`}
-              alt={record.image.name}
-            />
-            </div>
-          );
-        //<img src={`http://localhost:3005${record.image.location.split('public',2)[1]}`} alt="" width="100px" height="100px"/>
-        return (
-          <img
-            src={require("assets/images/noimage.jpg")}
-            alt=""
-            width="100px"
-            height="100px"
-          />
-        );
-      },
+      dataIndex: "name",
     },
     {
       title: "Price",

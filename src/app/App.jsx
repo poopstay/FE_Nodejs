@@ -1,22 +1,10 @@
 import React, { useEffect } from "react";
 import "./App.scss";
 import { Routes, Route } from "react-router-dom";
-import { routers, unAuthRouter } from "router/router";
-import { useDispatch } from 'react-redux';
-import {actionGetMyProfile} from 'store/auth/action'
-import { useSelector } from "react-redux/es/hooks/useSelector";
+import { routers,} from "router/router";
 
 function App() {
   // Post token in header
-  const dispatch = useDispatch();
-  const token = window.localStorage.getItem("TOKEN");
-  useEffect(() => {
-    if (token) {
-      dispatch(actionGetMyProfile(token))
-    }
-  }, [token,dispatch]);
-  const myProfile=useSelector(state=>state.authReducer.myProfile)
-  if (token && myProfile) {
     return (
       <Routes>
         {routers.map((r, idx) => {
@@ -41,14 +29,5 @@ function App() {
       </Routes>
     );
   }
-
-  return (
-    <Routes>
-      {unAuthRouter.map((r, idx) => {
-        return <Route path={r.path} element={r.element} key={idx} />;
-      })}
-    </Routes>
-  );
-}
 
 export default App;

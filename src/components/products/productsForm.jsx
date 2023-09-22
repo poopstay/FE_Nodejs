@@ -98,18 +98,6 @@ function ProductsForm(props) {
           <Input />
         </Form.Item>
         <Form.Item
-          label="Hình ảnh"
-          name="upload"
-        >
-        <Upload
-          name="file"
-          beforeUpload={true}
-          listType="picture"
-        >
-          <Button icon={<UploadOutlined />}>Click to Upload</Button>
-        </Upload>
-        </Form.Item>
-        <Form.Item
           label="Giá gốc"
           name="price"
           rules={[

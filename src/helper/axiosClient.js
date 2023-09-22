@@ -6,6 +6,6 @@ export const axiosAdmin = axios.create({
 });
 
 export const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL_USER,
+  baseURL: process.env.REACT_APP_BASE_USE_URL,
   headers: { "Content-Type": "application/json" },
 });
