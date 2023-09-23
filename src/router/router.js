@@ -8,6 +8,8 @@ import LoginPage from 'pages/loginPage';
 // import Category from 'components/category';
 // import Supplier from 'components/supplier';
 import NotFoundPage from 'pages/NotFoundPage';
+import Categories from 'components/categories';
+import Supplier from 'components/supplier';
 // import ManualAntUpload from 'components/media';
 // import Logout from 'components/logout';
 // import MyProfile from 'pages/myProfile';
@@ -17,13 +19,13 @@ export const routers = [
     name: "Layout",
     element: <Layouts />,
     children: [
-      { isRoot: true, name: "Home", element: <Main/> },
+      { isRoot: true, name: "Home", element: <ProductsPage/> },
       { path: LOCATIONS.PRODUCTS, name: "Product Page", element: <ProductsPage/> },
       { path: LOCATIONS.ADD_PRODUCT, name: "Add Product", element: <ProductsPage/> },
       // { path: LOCATIONS.PRODUCT_DETAILS, name: "Product Details", element:<Details/> },
-      // { path: LOCATIONS.CATEGORY, name: "Category List", element:<Category/> },
+     { path: LOCATIONS.CATEGORY, name: "Category List", element:<Categories/> },
       // { path: LOCATIONS.ADD_CATEGORY, name: "Add Category", element:<Category/> },
-      // { path: LOCATIONS.SUPPLIER, name: "Supplier List", element:<Supplier/> },
+     { path: LOCATIONS.SUPPLIER, name: "Supplier List", element:<Supplier/> },
       // { path: LOCATIONS.ADD_SUPPLIER, name: "Add Supplier", element:<Supplier/> },
       // { path: LOCATIONS.UPLOAD, name: "Upload Page", element:<ManualAntUpload/> },
       // { path: LOCATIONS.LOGOUT, name: "Logout", element:<Logout/> },

@@ -1,6 +1,5 @@
 // import
 import React, { memo, useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
 import {
   Space,
   Table,
@@ -9,28 +8,33 @@ import {
   Popconfirm,
   Modal,
   message,
-  Pagination,
   Row,
-  Col
+  Col,
+  Pagination,
+  Select,
 } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 import { axiosClient } from "helper/axiosClient";
-import SupplierForm from "./supplierForm";
-function Supplier() {
+import CategoriesForm from "./categoriesForm";
+const url = process.env.REACT_APP_BASE_USE_URL;
+function Categories() {
   // variable
-  const DEFAULT_LIMIT = 4;
+  const DEFAULT_LIMIT = 5;
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
     pageSize: DEFAULT_LIMIT,
   });
+  const [search, setSearch] = useState({
+    categoryId: undefined,
+  });
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [suppliers, setSupplier] = useState([]);
   const [refresh, setRefresh] = useState(0);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [isHidden, setIsHidden] = useState(true);
+  const [categories, setCategories] = useState([]);
   const [updateForm] = Form.useForm();
-  const [isHidden,setIsHidden]=useState(true)
 
   const onSelectProduct = useCallback(
     (data) => () => {
@@ -42,85 +46,67 @@ function Supplier() {
     },
     [updateForm]
   );
+
   const onFinish = useCallback(
     async (values) => {
-      console.log('◀◀◀ values ▶▶▶',values);
-      await axiosClient
-        .post("/suppliers", values)
-        .then(function (response) {
-          setRefresh(refresh + 1);
-          message.success("Thêm thành công");
-        })
-        .catch(function (error) {
-          
-          if(error.response.data.errors){
-            error.response.data.errors.map((e) => message.error(e));
-          }else{
-            console.log('◀◀◀ error ▶▶▶',error);
-            message.error("Thêm thất bại. Vui lòng kiểm tra lại thông tin");
-          }
-
-        });
+      try {
+        await axiosClient.post("/category", values);
+        setRefresh(refresh + 1);
+        setIsHidden(true);
+        alert("Thêm sản phẩm thành công");
+      } catch (error) {
+        return alert("Thêm sản phẩm thất bại");
+      }
     },
     [refresh]
   );
   const onDeleteFinish = useCallback(
     (id) => async () => {
       try {
-        await axiosClient.patch(`/suppliers/delete/${id}`);
+        await axiosClient.patch(`/category/delete/${id}`);
 
         setRefresh(refresh + 1);
-        message.success("Xóa thành công");
+        alert("Xóa thành công");
       } catch (error) {
-        message.error("Xóa thất bại");
+        alert("Xóa thất bại");
       }
     },
     [refresh]
   );
   const onEditFinish = useCallback(
-    
     async (data) => {
       try {
-        await axiosClient.put(
-          `/suppliers/${selectedProduct._id}`,
-          data
-        );
-
+        await axiosClient.put(`/category/${selectedProduct._id}`, data);
         setRefresh(refresh + 1);
         updateForm.resetFields();
-        
         setEditModalVisible(false);
         message.success("Cập nhật thành công");
       } catch (error) {
-        message.error("Cập nhật thất bại. Vui lòng kiểm tra lại thông tin");
+        message.error("Cập nhật thất bại");
       }
     },
     [selectedProduct, updateForm, refresh]
   );
-  const getSupplier = useCallback(async () => {
+  const getCategories = useCallback(async () => {
     try {
-      const res = await axiosClient.get(`/suppliers?page=${pagination.page}&pageSize=${pagination.pageSize}`);
-      setSupplier(res.data.payload);
-      setPagination((prev)=>({...prev,total:res.data.total}))
+      const res = await axiosClient.get("/category");
+      setCategories(res.data.payload);
     } catch (err) {
       console.log("◀◀◀ err ▶▶▶", err);
     }
-  }, [pagination.page, pagination.pageSize]);
-  const onChangePage = useCallback(
-    (page, pageSize) => {
-      setPagination((prev) => ({
-        ...prev,
-        page,
-        pageSize,
-      }));
+  }, []);
+  const onChangePage = useCallback((page, pageSize) => {
+    setPagination((prev) => ({
+      ...prev,
+      page,
+      pageSize,
+    }));
+  }, []);
 
-    },
-    []
-  );
 
   useEffect(() => {
-    getSupplier();
-  }, [getSupplier, refresh]);
+    getCategories();
+  }, [getCategories, refresh]);
   const columns = [
     {
       title: "STT",
@@ -132,25 +118,12 @@ function Supplier() {
     {
       title: "Name",
       key: "name",
-      render: (text, record, index) => {
-        return <Link to={`/product_details/${record._id}`}>{record.name}</Link>;
-      },
-    },
-
-    {
-      title: "Email",
-      key: "email",
-      dataIndex: "email",
+      dataIndex: "name",
     },
     {
-      title: "Phone Number",
-      key: "phone",
-      dataIndex: "phoneNumber",
-    },
-    {
-      title: "Address",
-      key: "address",
-      dataIndex: "address",
+      title: "Description",
+      key: "description",
+      dataIndex: "description",
     },
     {
       title: "Action",
@@ -178,20 +151,45 @@ function Supplier() {
       },
     },
   ];
+  const handleChange = (value) => {
+    console.log("◀◀◀ choose ▶▶▶", value);
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
+    }));
+    setSearch((prev) => {
+      if (value === "all") {
+        return {
+          ...prev,
+          categoryId: null,
+        };
+      }
+      return {
+        ...prev,
+        categoryId: value,
+      };
+    });
+  };
   return (
     // main
     <>
-    <Row>
+      <Row>
         <Col span={20}>
-          <h1>Suppliers</h1>
+          <h1>Categories</h1>
         </Col>
       </Row>
-        <SupplierForm onFinish={onFinish} />
-      
+
+     
+        <div className="container">
+          <CategoriesForm
+            formName="add-product-form"
+            onFinish={onFinish}
+          />
+        </div>
       <Table
         rowKey="_id"
         columns={columns}
-        dataSource={suppliers}
+        dataSource={categories}
         pagination={false}
       />
       <Pagination
@@ -213,7 +211,7 @@ function Supplier() {
           updateForm.submit();
         }}
       >
-        <SupplierForm
+        <CategoriesForm
           form={updateForm}
           onFinish={onEditFinish}
           formName="update-product"
@@ -223,4 +221,4 @@ function Supplier() {
     </>
   );
 }
-export default memo(Supplier);
+export default memo(Categories);
